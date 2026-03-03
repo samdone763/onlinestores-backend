@@ -400,18 +400,16 @@ app.post('/api/push/notify-order', async (req, res) => {
       process.env.VAPID_PRIVATE_KEY
     );
 
-    const payload = JSON.stringify({
-      title: '🛍️ Order Mpya!',
-      body: orderData.customer.name + ' ameagiza ' + orderData.product.name + ' — TZS ' + Number(orderData.product.price * orderData.product.qty).toLocaleString(),
-      orderId: orderData.orderId,
-      icon: '/onlinestores-tz/icon.png'
-    });
-
+    const total=(orderData.product.price*orderData.product.qty)+(orderData.deliveryFee||0);
+const payload = JSON.stringify({
+  title: 'Order Mpya! - ' + orderData.product.name,
+  body: orderData.customer.name + ' x' + orderData.product.qty + ' | TZS ' + Number(total).toLocaleString() + ' | ' + orderData.customer.region,
+  orderId: orderData.orderId,
+  icon: '/onlinestores-tz/icon.png'
+});
     const results = await Promise.allSettled(
-      subs.map(s => webpush.sendNotification(s.subscription, payload))
-    );
-
-    // Clean up expired subscriptions
+  subs.map(s => webpush.sendNotification(s.subscription, payload))
+);
     for (let i = 0; i < results.length; i++) {
       if (results[i].status === 'rejected') {
         await PushSub.findByIdAndDelete(subs[i]._id);

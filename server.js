@@ -442,4 +442,6 @@ app.delete('/api/business', authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch(e) { res.status(500).json({ message: e.message }); }
 });
+const reviewsRouter = require('./routes/reviews');
+app.use('/api/reviews', reviewsRouter);
 app.listen(PORT, () => console.log(`Online Stores TZ backend running on port ${PORT}`));

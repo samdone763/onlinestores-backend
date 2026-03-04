@@ -428,5 +428,18 @@ app.post('/api/push/notify-custom', authMiddleware, async (req, res) => {
     res.json({ success: true, message: 'Feature coming soon' });
   } catch(e) { res.status(500).json({ message: e.message }); }
 });
-
+// Delete business and all associated data
+app.delete('/api/business', authMiddleware, async (req, res) => {
+  try {
+    const businessId = req.businessId;
+    await Product.deleteMany({ businessId });
+    await Order.deleteMany({ businessId });
+    await Gallery.deleteMany({ businessId });
+    await Video.deleteMany({ businessId });
+    await DeliveryFee.deleteMany({ businessId });
+    await PushSub.deleteMany({ businessId });
+    await Business.findByIdAndDelete(businessId);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ message: e.message }); }
+});
 app.listen(PORT, () => console.log(`Online Stores TZ backend running on port ${PORT}`));

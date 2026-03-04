@@ -444,4 +444,29 @@ app.delete('/api/business', authMiddleware, async (req, res) => {
 });
 const reviewsRouter = require('./routes/reviews');
 app.use('/api/reviews', reviewsRouter);
+// SEO meta data kwa kila shop
+app.get('/api/seo/:shopId', async (req, res) => {
+  try {
+    const shop = await Business.findOne({ shopId: req.params.shopId });
+    if (!shop) return res.status(404).json({ error: 'Duka halijapatikana' });
+
+    const Review = mongoose.model('Review');
+    const reviews = await Review.find({ shopId: req.params.shopId });
+    const avg = reviews.length > 0
+      ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+      : null;
+
+    res.json({
+      title: shop.businessName,
+      description: `Tembelea ${shop.businessName} — duka bora Tanzania`,
+      image: shop.logo || '',
+      shopId: shop.shopId,
+      rating: avg ? avg.toFixed(1) : null,
+      reviewCount: reviews.length,
+      url: `https://samdone763.github.io/onlinestores-tz?shop=${shop.shopId}`
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Imeshindwa kupata data' });
+  }
+});
 app.listen(PORT, () => console.log(`Online Stores TZ backend running on port ${PORT}`));

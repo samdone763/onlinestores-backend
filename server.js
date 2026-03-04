@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { router: shortUrlRouter, ShortUrl } = require('./routes/shorturl');
 const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
 
 const app = express();
@@ -470,3 +471,15 @@ app.get('/api/seo/:shopId', async (req, res) => {
   }
 });
 app.listen(PORT, () => console.log(`Online Stores TZ backend running on port ${PORT}`));
+app.use('/api/shorturl', shortUrlRouter);
+app.get('/s/:code', async (req, res) => {
+  try {
+    const entry = await ShortUrl.findOne({ code: req.params.code });
+    if (!entry) return res.redirect('https://samdone763.github.io/onlinestores-tz');
+    entry.clicks += 1;
+    await entry.save();
+    res.redirect(`https://samdone763.github.io/onlinestores-tz?shop=${entry.shopId}`);
+  } catch (err) {
+    res.redirect('https://samdone763.github.io/onlinestores-tz');
+  }
+});

@@ -437,3 +437,6 @@ app.get('/s/:code', async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Online Stores TZ backend running on port ${PORT}`));
+
+// Alias route
+app.post('/api/login', async (req, res) => { req.url = '/api/business/login'; app._router.handle(req, res); });

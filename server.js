@@ -407,7 +407,19 @@ app.post('/api/chat', async (req, res) => {
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
         messages: [
-          { role: 'system', content: `Wewe ni msaidizi wa duka la ${businessContext?.businessName || 'Online Stores TZ'}. Jibu kwa Kiswahili. Usizidi maneno 150.` },
+          app.post('/api/chat', async (req, res) => {
+  try {
+    const { messages, businessContext } = req.body;
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: businessContext?.systemPrompt || `Wewe ni msaidizi wa Online Stores TZ. Jibu kwa Kiswahili vizuri na kwa urahisi.` },
           ...messages
         ],
         max_tokens: 300
